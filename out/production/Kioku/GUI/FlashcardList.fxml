@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.FlashcardList">
+  <children>
+    <MenuBar prefHeight="27.0" prefWidth="640.0" VBox.vgrow="NEVER">
+      <menus>
+        <Menu mnemonicParsing="false" text="Archivo">
+          <items>
+            <MenuItem mnemonicParsing="false" text="Nueva tarjeta" />
+            <MenuItem mnemonicParsing="false" text="Nueva Deck" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Ayuda">
+          <items>
+            <MenuItem mnemonicParsing="false" text="Acerca de" />
+          </items>
+        </Menu>
+      </menus>
+    </MenuBar>
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="368.0" prefWidth="577.0" VBox.vgrow="ALWAYS">
+      <children>
+            <SplitPane dividerPositions="0.29797979797979796" prefHeight="373.0" prefWidth="640.0">
+              <items>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                     <children>
+                        <Text fx:id="deckLabel" layoutX="25.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Decks" wrappingWidth="136.13671875">
+                           <font>
+                              <Font name="Cambria" size="17.0" />
+                           </font>
+                        </Text>
+                        <ListView fx:id="deckListView" layoutX="25.0" layoutY="58.0" prefHeight="200.0" prefWidth="150.0" />
+                     </children>
+                  </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="219.0" prefWidth="348.0">
+                     <children>
+                        <Text fx:id="flaschardLabel" layoutX="14.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tarjetas" wrappingWidth="136.13671875">
+                           <font>
+                              <Font name="Cambria" size="17.0" />
+                           </font>
+                        </Text>
+                        <TableView fx:id="flaschardListTable" layoutX="15.0" layoutY="46.0" prefHeight="305.0" prefWidth="415.0">
+                          <columns>
+                            <TableColumn prefWidth="75.0" text="id" />
+                            <TableColumn prefWidth="113.0" text="front" />
+                              <TableColumn prefWidth="102.0" text="back" />
+                              <TableColumn prefWidth="124.0" text="deckId" />
+                          </columns>
+                        </TableView>
+                     </children>
+                  </AnchorPane>
+              </items>
+            </SplitPane>
+      </children>
+    </AnchorPane>
+  </children>
+</VBox>
