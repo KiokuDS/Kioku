@@ -1,10 +1,7 @@
 package BusinessLogic;
-import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-
+import java.util.LinkedList;
 
 public class Flashcard {
 
@@ -13,15 +10,41 @@ public class Flashcard {
     public String front;
     private String back;
     private Deck deck;
-    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
     private LocalDate nextRevision = LocalDate.now();
     public Flashcard left;
     public Flashcard right;
+    public String related1;
+    public String related2;
+
+    //Atributos de relacion entre tarjetas.
+    private LinkedList relatedFlashcards;
+
+    public LinkedList getRelatedFlashcards() {
+        return relatedFlashcards;
+    }
+
+    public void setRelatedFlashcards(LinkedList relatedFlashcards) {
+        this.relatedFlashcards = relatedFlashcards;
+    }
+
+    //Atributos relacionados al calculo de la dificultad.
+
+    private int repetitions;
+    private float easiness;
+
 
     public Flashcard(String front, String back){
         this.front = front;
         this.back = back;
+        relatedFlashcards = new LinkedList<Flashcard>();
         id = numberFlashcards++;
+    }
+
+    public void insertRelated(Flashcard f){
+        this.relatedFlashcards.add(f);;
+    }
+    public void deleteRelated(Flashcard f){
+        this.relatedFlashcards.remove(f);;
     }
 
     public int getId() {
@@ -75,11 +98,12 @@ public class Flashcard {
         this.nextRevision = nextRevision;
     }
 
+
     public void setNextEasy(){
         this.nextRevision = nextRevision.plusDays(3);
     }
     public void setNextHard(){
-        this.nextRevision = nextRevision.plusDays(1);
+        this.nextRevision = nextRevision.plusDays(0);
     }
 
     // Dos tarjetas no pueden tener el mismo front.

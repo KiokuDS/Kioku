@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 
 import BusinessLogic.util.LinkedList;
+import BusinessLogic.util.Map;
 import BusinessLogic.util.SqliteDB;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -25,7 +26,7 @@ import javafx.scene.text.Text;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class FlashcardList implements Initializable {
+public class Dictionary implements Initializable {
 
     //Vista de tabla
     private ObservableList<ObservableList> data;
@@ -37,6 +38,10 @@ public class FlashcardList implements Initializable {
     private ObservableList<String> items = FXCollections.observableArrayList();
     private int selectedDeck = 1;
     private int selectedFlashcard = 1;
+
+    // Hashtable
+
+    Map hashTableDemo = new Map<>();
 
     public void buildData(){
         Connection c ;

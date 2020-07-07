@@ -26,14 +26,16 @@ public class CreateFlashcard implements Initializable {
     private TextField back;
 
     @FXML
+    private ChoiceBox<String> relatedFlashcard1;
+
+    @FXML
+    private ChoiceBox<String> relatedFlashcard2;
+
+    @FXML
     private ChoiceBox<String> choiceDeck;
 
     @FXML
     void createFlashcardButtonAction(ActionEvent event) {
-        //Falta validacion
-        //Falta insercion en base de datos.
-
-
     }
 
     @Override
@@ -41,9 +43,15 @@ public class CreateFlashcard implements Initializable {
 
         SqliteDB db = new SqliteDB();
         LinkedList deckList = new LinkedList();
+        LinkedList flashcardList = new LinkedList();
+        db.listsFlashcards(flashcardList);
         db.listsDecks(deckList);
         for(int i=0; i< deckList.size(); i++){
             choiceDeck.getItems().addAll((String) deckList.get(i));
+        }
+        for(int i=0; i< flashcardList.size(); i++){
+            relatedFlashcard1.getItems().addAll((String) flashcardList.get(i));
+            relatedFlashcard2.getItems().addAll((String) flashcardList.get(i));
         }
         //Despues de validacion
         createFlashcardButton.setOnAction(e-> {

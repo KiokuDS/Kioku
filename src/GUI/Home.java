@@ -14,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
@@ -78,7 +79,7 @@ public class Home implements Initializable {
         window.show();
     }
 
-    public void initActions(){
+    private void initActions(){
         //Detecting mouse clicked
         list.setOnMouseClicked(new EventHandler<MouseEvent>(){
             @Override
@@ -95,6 +96,23 @@ public class Home implements Initializable {
                     }
             }
         });
+    }
+
+    @FXML
+    private MenuItem listaTarjetasMenu;
+
+    @FXML
+    void listaTarjetasMenuAction(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource("FlashcardList.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 640 , 400);
+            Stage stage = new Stage();
+            stage.setTitle("Lista de Flashcards");
+            stage.setScene(scene);
+            stage.showAndWait();
+        } catch (IOException e) {
+        }
     }
     private static int selection;
     public void setSelected(int select){

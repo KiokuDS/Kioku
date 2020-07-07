@@ -79,6 +79,9 @@ public class ListArray <T>  {
     public int getSize() {
         return size;
     }
+    public boolean isEmpty(){
+        return size==0;
+    }
 
 
     public void print() {

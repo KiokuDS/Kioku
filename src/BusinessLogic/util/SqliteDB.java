@@ -2,12 +2,13 @@ package BusinessLogic.util;
 
 
 import java.sql.*;
+import java.time.LocalDate;
 
 import BusinessLogic.Flashcard;
-import BusinessLogic.util.LinkedList;
 import BusinessLogic.util.StackArray;
-
 public class SqliteDB {
+
+    LocalDate currentDate = LocalDate.now();
     Connection c = null;
 
     public SqliteDB(){
@@ -27,6 +28,20 @@ public class SqliteDB {
             while(rs.next()){
                 String deckName = rs.getString("name");
                 linkedlist.insert(i, deckName);
+                i++;
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+    public void listsFlashcards(LinkedList linkedlist) {
+        try{
+            Statement statement = c.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT front FROM Flashcards");
+            int i = 0;
+            while(rs.next()){
+                String flashcardFront = rs.getString("front");
+                linkedlist.insert(i, flashcardFront);
                 i++;
             }
         } catch (Exception e){
@@ -58,18 +73,61 @@ public class SqliteDB {
             System.out.println(e.getMessage());
         }
     }
+    public void linkedFlaschard(ListArray linkedList, int deckId) {
+        try{
+            Statement statement = c.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT front, back FROM Flashcards WHERE deck="+deckId+" AND revisionDate="+"'"+currentDate+"'");
+            int i = 0;
+            while(rs.next()){
+                String front = rs.getString("front");
+                String back = rs.getString("back");
+                linkedList.insert(new Flashcard(front, back));
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
     public void insertFlashcard(String front, String back, int deck){
-        String sql = "INSERT INTO Flashcards(front, back, deck) VALUES(?,?,?)";
+        LocalDate localDate = LocalDate.now();
+        String sql = "INSERT INTO Flashcards(front, back, deck, revisionDate) VALUES(?,?,?,?)";
         try {
             PreparedStatement pstmt = c.prepareStatement(sql);
             pstmt.setString(1, front);
             pstmt.setString(2, back);
             pstmt.setInt(3, deck);
+            pstmt.setString(4, localDate.toString());
             pstmt.executeUpdate();
         } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
     }
+    public int getRelated1ById(int id){
+        int related = -1;
+        try{
+            Statement statement = c.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT related1 FROM Flashcards WHERE id="+id+1);
+            while(rs.next()){
+                related = rs.getInt("related1");
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return related;
+    }
+    public int getRelated2ById(int id){
+        int related = -1;
+        try{
+            Statement statement = c.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT related2 FROM Flashcards WHERE id="+id+1);
+            while(rs.next()){
+                related = rs.getInt("related2");
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return related;
+    }
+
     public void insertDeck(String deck){
         String sql = "INSERT INTO Decks(name) VALUES(?)";
         try {
@@ -98,4 +156,11 @@ public class SqliteDB {
         }
        return rs;
     }*/
+
+    public Connection getC() {
+        return c;
+    }
+    public void setC(Connection c) {
+        this.c = c;
+    }
 }

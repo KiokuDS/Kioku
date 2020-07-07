@@ -2,6 +2,8 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -57,6 +59,13 @@
             <Polygon layoutX="79.0" layoutY="33.0" points="-40.0, 11.0, -40.0, -1.0, -50.0, 5.0" stroke="BLACK" strokeType="INSIDE" />
             <Button id="createDeckId" fx:id="finishLessonButton" layoutX="163.0" layoutY="194.0" mnemonicParsing="false" onAction="#finishLessonButtonAction" prefHeight="24.0" prefWidth="88.0" text="Inicio" visible="false" />
             <TextArea fx:id="returnHomeText" layoutX="57.0" layoutY="71.0" prefHeight="86.0" prefWidth="308.0" text="Has terminado todas las tarjetas programadas&#10;para hoy.&#10;" visible="false" />
+            <Label fx:id="restantes" layoutX="150.0" layoutY="358.0" text="Tarjetas Restantes: ">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <ListView fx:id="relatedFlashcardsView" layoutX="107.0" layoutY="220.0" prefHeight="75.0" prefWidth="200.0" />
+            <Text fx:id="relatedText" layoutX="107.0" layoutY="206.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Relacionadas" />
       </children>
     </AnchorPane>
   </children>

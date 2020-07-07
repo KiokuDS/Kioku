@@ -2,6 +2,7 @@ package GUI;
 
 import BusinessLogic.Flashcard;
 import BusinessLogic.util.LinkedList;
+import BusinessLogic.util.Map;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,9 +23,9 @@ public class Main extends Application {
 
     }
 
-
     public static void main(String[] args) {
         launch(args);
+
     }
 
 }
