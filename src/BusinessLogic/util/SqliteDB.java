@@ -3,6 +3,9 @@ package BusinessLogic.util;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import BusinessLogic.Flashcard;
 import BusinessLogic.util.StackArray;
@@ -37,10 +40,10 @@ public class SqliteDB {
     public void listsFlashcards(LinkedList linkedlist) {
         try{
             Statement statement = c.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT front FROM Flashcards");
+            ResultSet rs = statement.executeQuery("SELECT back FROM Flashcards");
             int i = 0;
             while(rs.next()){
-                String flashcardFront = rs.getString("front");
+                String flashcardFront = rs.getString("back");
                 linkedlist.insert(i, flashcardFront);
                 i++;
             }
@@ -59,73 +62,126 @@ public class SqliteDB {
         }
         return deckName;
     }
-    public void listsFlaschard(StackArray stackArray, int deckId) {
-        try{
-            Statement statement = c.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT front, back FROM Flashcards WHERE deck="+deckId);
-            int i = 0;
-            while(rs.next()){
-                String front = rs.getString("front");
-                String back = rs.getString("back");
-                stackArray.push(new Flashcard(front, back));
-            }
-        } catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-    }
     public void linkedFlaschard(ListArray linkedList, int deckId) {
         try{
             Statement statement = c.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT front, back FROM Flashcards WHERE deck="+deckId+" AND revisionDate="+"'"+currentDate+"'");
+            ResultSet rs = statement.executeQuery("SELECT front, back, related1, related2 FROM Flashcards WHERE deck="+deckId+" AND revisionDate="+"'"+currentDate+"'");
             int i = 0;
             while(rs.next()){
                 String front = rs.getString("front");
                 String back = rs.getString("back");
-                linkedList.insert(new Flashcard(front, back));
+                String related1 = rs.getString("related1");
+                String related2 = rs.getString("related2");
+                linkedList.insert(new Flashcard(front, back, related1, related2));
+            }
+        } catch (Exception e){
+            System.out.println("Error al traer lista de tarjetas.");
+        }
+    }
+
+    public void setEasy(Flashcard f){
+        String sql = "UPDATE Flashcards SET revisionDate = ? WHERE front = ?";
+        System.out.println(f.getNextRevision().plusDays(3).toString());
+        try {
+            PreparedStatement pstmt = c.prepareStatement(sql);
+            pstmt.setString(1, f.getNextRevision().plusDays(3).toString());
+            pstmt.setString(2, f.getFront());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    public void insertIntoMap(HashMap map) {
+        try{
+            Statement statement = c.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT front, back, related1, related2 FROM Flashcards");
+            while(rs.next()){
+                String front = rs.getString("front");
+                String back = rs.getString("back");
+                String related1 = rs.getString("related1");
+                String related2 = rs.getString("related2");
+                map.put(front ,new Flashcard(front, back, related1, related2));
             }
         } catch (Exception e){
             System.out.println(e.getMessage());
         }
     }
-    public void insertFlashcard(String front, String back, int deck){
+
+    public void insertIntoTree(TreeSet tree) {
+        try{
+            Statement statement = c.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT front FROM Flashcards");
+            while(rs.next()){
+                String front = rs.getString("front");
+                tree.add(front);
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+    public void modifyFlashcard(Flashcard f, int deck, String oldFront){
+        String sql = "UPDATE Flashcards SET front = ?, back = ?, deck = ?, related1 = ?, related2 =? WHERE front = ?";
+        try {
+            PreparedStatement pstmt = c.prepareStatement(sql);
+            pstmt.setString(1, f.getFront());
+            pstmt.setString(2, f.getBack());
+            pstmt.setInt(3, deck);
+            pstmt.setString(4, f.getRelated1());
+            pstmt.setString(5, f.getRelated2());
+            pstmt.setString(6, oldFront);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    public Flashcard getFlashcardByFront(String oldFront){
+        String sql = "SELECT front, back, related1, related2 FROM Flashcards WHERE front="+"'"+oldFront+"'";
+        Flashcard temp = new Flashcard("","","","");
+        try{
+            Statement statement = c.createStatement();
+            ResultSet rs = statement.executeQuery(sql);
+            while(rs.next()){
+                temp.setFront(rs.getString("front"));
+                temp.setBack(rs.getString("back"));
+                temp.setRelated1(rs.getString("related1"));
+                temp.setRelated2(rs.getString("related2"));
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return temp;
+    }
+    public void insertFlashcard(String front, String back, String related1, String related2, int deck){
         LocalDate localDate = LocalDate.now();
-        String sql = "INSERT INTO Flashcards(front, back, deck, revisionDate) VALUES(?,?,?,?)";
+        String sql = "INSERT INTO Flashcards(front, back, deck, related1, related2, revisionDate) VALUES(?,?,?,?,?,?)";
         try {
             PreparedStatement pstmt = c.prepareStatement(sql);
             pstmt.setString(1, front);
             pstmt.setString(2, back);
             pstmt.setInt(3, deck);
-            pstmt.setString(4, localDate.toString());
+            pstmt.setString(4, related1);
+            pstmt.setString(5, related2);
+            pstmt.setString(6, localDate.toString());
             pstmt.executeUpdate();
         } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
     }
-    public int getRelated1ById(int id){
-        int related = -1;
-        try{
-            Statement statement = c.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT related1 FROM Flashcards WHERE id="+id+1);
-            while(rs.next()){
-                related = rs.getInt("related1");
-            }
-        } catch (Exception e){
+    public void insertFlashcard(Flashcard f, int deck){
+        LocalDate localDate = LocalDate.now();
+        String sql = "INSERT INTO Flashcards(front, back, deck, related1, related2, revisionDate) VALUES(?,?,?,?,?,?)";
+        try {
+            PreparedStatement pstmt = c.prepareStatement(sql);
+            pstmt.setString(1, f.getFront());
+            pstmt.setString(2, f.getBack());
+            pstmt.setInt(3, deck);
+            pstmt.setString(4, f.getRelated1());
+            pstmt.setString(5, f.getRelated2());
+            pstmt.setString(6, localDate.toString());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return related;
-    }
-    public int getRelated2ById(int id){
-        int related = -1;
-        try{
-            Statement statement = c.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT related2 FROM Flashcards WHERE id="+id+1);
-            while(rs.next()){
-                related = rs.getInt("related2");
-            }
-        } catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-        return related;
     }
 
     public void insertDeck(String deck){
@@ -145,17 +201,6 @@ public class SqliteDB {
             System.out.println("Error" + e.getMessage());
         }
     }
-    /*public ResultSet executeQuery(String query){
-        try{
-            Statement statement = c.createStatement();
-            statement = c.createStatement();
-            ResultSet rs = statement.executeQuery(query);
-            return rs;
-        } catch (Exception e){
-            System.out.println("Error al hacer query");
-        }
-       return rs;
-    }*/
 
     public Connection getC() {
         return c;

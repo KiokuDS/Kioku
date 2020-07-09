@@ -1,5 +1,6 @@
 package GUI;
 
+import BusinessLogic.Flashcard;
 import BusinessLogic.util.LinkedList;
 import BusinessLogic.util.SqliteDB;
 import javafx.event.ActionEvent;
@@ -54,8 +55,12 @@ public class CreateFlashcard implements Initializable {
             relatedFlashcard2.getItems().addAll((String) flashcardList.get(i));
         }
         //Despues de validacion
+
         createFlashcardButton.setOnAction(e-> {
-            db.insertFlashcard(front.getText(), back.getText(), choiceDeck.getSelectionModel().getSelectedIndex()+1);
+            Flashcard tempInserted = new Flashcard(front.getText(), back.getText(), relatedFlashcard1.getSelectionModel().getSelectedItem(), relatedFlashcard2.getSelectionModel().getSelectedItem());
+            db.insertFlashcard(tempInserted, choiceDeck.getSelectionModel().getSelectedIndex()+1);
+            //db.insertFlashcard(front.getText(), back.getText(),, relatedFlashcard1.getSelectionModel().getSelectedItem(), relatedFlashcard2.getSelectionModel().getSelectedItem(), choiceDeck.getSelectionModel().getSelectedIndex()+1);
+            db.closeConnection();
             Stage stage = (Stage) createFlashcardButton.getScene().getWindow();
             stage.close();
         });

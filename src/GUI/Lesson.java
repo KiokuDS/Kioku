@@ -25,6 +25,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Lesson implements Initializable {
 
+
+    static String selectedCard;
+    static boolean fromAnother;
+
+    static void setFromAnother(boolean b){
+        fromAnother=b;
+    }
     @FXML
     private Button answerButton;
 
@@ -107,6 +114,26 @@ public class Lesson implements Initializable {
     @FXML
     private Text relatedText;
 
+    @FXML
+    private Button editFlashcard;
+
+    @FXML
+    void editFlashcardAction(ActionEvent event, String selectedCard) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            this.selectedCard = selectedCard;
+            fxmlLoader.setLocation(getClass().getResource("SearchAndModify.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 345 , 480);
+            Stage stage = new Stage();
+            stage.setTitle("Editar Tarjeta");
+            stage.setScene(scene);
+            stage.showAndWait();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -119,90 +146,104 @@ public class Lesson implements Initializable {
         AtomicInteger currentFlashcard = new AtomicInteger();
         /*StackArray demoDeck = new StackArray(100);*/
         ListArray dailyDeck = new ListArray();
-        ListArray staticDeck = new ListArray();
         SqliteDB db = new SqliteDB();
-        DeckNameTitle.setText("Deck seleccionado: "+ db.getDeckName(Home.getSelected()));
+        DeckNameTitle.setText("Deck seleccionado: " + db.getDeckName(Home.getSelected()));
         db.linkedFlaschard(dailyDeck, Home.getSelected());
-        db.linkedFlaschard(staticDeck, Home.getSelected());
-
         // Tarjetas Relacionadas Demo
         // Es necesario seralizar el ListArray de tarjetas relacionadas y almancenar esta info en la base de datos pero esto requiere que Flashcard sera serializable, lo cual aun no
         // ha sido implementado.
 
-        relatedFlashcardsView.setItems(itemsRelated);
-        
         //Bucle de leccion.
-
-        Flashcard lessonFlashcard = (Flashcard) dailyDeck.getItem(currentFlashcard.get());
-        cover.setText(lessonFlashcard.getFront());
-        back.setText(lessonFlashcard.getBack());
-        restantes.setText("Tarjetas restantes: "+dailyDeck.getSize());
-        answerButton.setOnAction(e -> {
-            lessonButtonBar.setVisible(true);
-            answerButton.setVisible(false);
-            back.setVisible(true);
-            relatedText.setVisible(false);
+        if (dailyDeck.getSize() == 0) {
+            returnHomeText.setVisible(true);
+            finishLessonButton.setVisible(true);
             relatedFlashcardsView.setVisible(false);
-            itemsRelated.clear();
-            cover.setVisible(false);
-            if(!dailyDeck.isEmpty()){
-                easyButton.setOnAction(ae-> {
-                    dailyDeck.delete(currentFlashcard.get());
-                    Flashcard current = ((Flashcard) dailyDeck.getItem(currentFlashcard.get()));
-                    current.setNextEasy();
-                    cover.setText(current.getFront());
-                    back.setText(current.getBack());
-                    lessonButtonBar.setVisible(false);
-                    answerButton.setVisible(true);
-                    relatedFlashcardsView.setVisible(true);
-                    relatedText.setVisible(true);
-                    cover.setVisible(true);
-                    back.setVisible(false);
-                    restantes.setText("Tarjetas restantes: "+dailyDeck.getSize());
-                });
-            } else {
-                easyButton.setOnAction(ae -> {
-                    returnHomeText.setVisible(true);
-                    finishLessonButton.setVisible(true);
-                    relatedFlashcardsView.setVisible(false);
-                    relatedText.setVisible(false);
-                    lessonButtonBar.setVisible(false);
-                    back.setVisible(false);
-                });
-            }
-        });
-        HardButton.setOnAction(e -> {
-            lessonButtonBar.setVisible(true);
-            answerButton.setVisible(false);
-            back.setVisible(true);
-            cover.setVisible(false);
             relatedText.setVisible(false);
-            relatedFlashcardsView.setVisible(false);
-            if(!dailyDeck.isEmpty()){
-                HardButton.setOnAction(ae-> {
-                    Flashcard current = ((Flashcard) dailyDeck.getItem(currentFlashcard.getAndIncrement()));
-                    current.setNextHard();
-                    cover.setText(current.getFront());
-                    back.setText(current.getBack());
-                    lessonButtonBar.setVisible(false);
-                    relatedFlashcardsView.setVisible(true);
-                    relatedText.setVisible(true);
-                    answerButton.setVisible(true);
-                    cover.setVisible(true);
-                    back.setVisible(false);
-                });
-            } else {
-                HardButton.setOnAction(ae -> {
-                    returnHomeText.setVisible(true);
-                    finishLessonButton.setVisible(true);
-                    relatedFlashcardsView.setVisible(false);
-                    relatedText.setVisible(false);
-                    lessonButtonBar.setVisible(false);
-                    back.setVisible(false);
-                });
-            }
-        });
+            lessonButtonBar.setVisible(false);
+            back.setVisible(false);
+            answerButton.setVisible(false);
+            db.closeConnection();
+        } else {
+            Flashcard lessonFlashcard = (Flashcard) dailyDeck.getItem(currentFlashcard.get());
+            cover.setText(lessonFlashcard.getFront());
+            back.setText(lessonFlashcard.getBack());
+            restantes.setText("Tarjetas restantes: " + dailyDeck.getSize());
+            itemsRelated.addAll(lessonFlashcard.getRelated1(), lessonFlashcard.getRelated2());
+            relatedFlashcardsView.setItems(itemsRelated);
+            db.setEasy(lessonFlashcard);
+            answerButton.setOnAction(e -> {
+                lessonButtonBar.setVisible(true);
+                answerButton.setVisible(false);
+                back.setVisible(true);
+                relatedText.setVisible(false);
+                relatedFlashcardsView.setVisible(false);
+                itemsRelated.clear();
+                cover.setVisible(false);
+                if (!dailyDeck.isEmpty() && dailyDeck.getSize() != 1) {
+                    easyButton.setOnAction(ae -> {
+                        dailyDeck.delete(currentFlashcard.get());
+                        Flashcard current = ((Flashcard) dailyDeck.getItem(currentFlashcard.get()));
+                        db.setEasy(current);
+                        itemsRelated.clear();
+                        itemsRelated.addAll(current.getRelated1(), current.getRelated2());
+                        cover.setText(current.getFront());
+                        back.setText(current.getBack());
+                        lessonButtonBar.setVisible(false);
+                        answerButton.setVisible(true);
+                        relatedFlashcardsView.setVisible(true);
+                        relatedText.setVisible(true);
+                        cover.setVisible(true);
+                        back.setVisible(false);
+                        restantes.setText("Tarjetas restantes: " + dailyDeck.getSize());
+                    });
+                } else {
+                    easyButton.setOnAction(ae -> {
+                        db.closeConnection();
+                        returnHomeText.setVisible(true);
+                        finishLessonButton.setVisible(true);
+                        relatedFlashcardsView.setVisible(false);
+                        relatedText.setVisible(false);
+                        lessonButtonBar.setVisible(false);
+                        back.setVisible(false);
+                    });
+                }
+            });
+            HardButton.setOnAction(e -> {
 
+                lessonButtonBar.setVisible(true);
+                answerButton.setVisible(false);
+                back.setVisible(true);
+                cover.setVisible(false);
+                relatedText.setVisible(false);
+                relatedFlashcardsView.setVisible(false);
+                if (!dailyDeck.isEmpty()) {
+                    HardButton.setOnAction(ae -> {
+                        Flashcard current = ((Flashcard) dailyDeck.getItem(currentFlashcard.getAndIncrement()));
+                        current.setNextHard();
+                        cover.setText(current.getFront());
+                        back.setText(current.getBack());
+                        itemsRelated.clear();
+                        itemsRelated.addAll(current.getRelated1(), current.getRelated2());
+                        lessonButtonBar.setVisible(false);
+                        relatedFlashcardsView.setVisible(true);
+                        relatedText.setVisible(true);
+                        answerButton.setVisible(true);
+                        cover.setVisible(true);
+                        back.setVisible(false);
+                    });
+                } else {
+                    HardButton.setOnAction(ae -> {
+                        db.closeConnection();
+                        returnHomeText.setVisible(true);
+                        finishLessonButton.setVisible(true);
+                        relatedFlashcardsView.setVisible(false);
+                        relatedText.setVisible(false);
+                        lessonButtonBar.setVisible(false);
+                        back.setVisible(false);
+                    });
+                }
+            });
+        }
     }
 }
 

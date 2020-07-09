@@ -37,6 +37,7 @@ public class FlashcardList implements Initializable {
     private ObservableList<String> items = FXCollections.observableArrayList();
     private int selectedDeck = 1;
     private int selectedFlashcard = 1;
+    static boolean fromList = true;
 
     public void buildData(){
         Connection c ;
@@ -45,7 +46,7 @@ public class FlashcardList implements Initializable {
         try{
             c = database.getC();
             //SQL FOR SELECTING ALL OF CUSTOME
-            String SQL = "SELECT Id, Front as Frente, Back as Reverso FROM Flashcards WHERE Deck="+selectedDeck;
+            String SQL = "SELECT Id, Front as Frente, Back as Reverso, related1 as Relacionada1, related2 as Relacionada2 FROM Flashcards WHERE Deck="+selectedDeck;
             //ResultSet
             ResultSet rs = c.createStatement().executeQuery(SQL);
 

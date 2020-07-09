@@ -1,5 +1,4 @@
 package BusinessLogic.util;
-
 import java.util.ArrayList;
 
 public class Map <K, V> {
@@ -8,25 +7,26 @@ public class Map <K, V> {
         K key;
         V value;
 
-        HashNode<K, V> next;
+        private HashNode<K, V> next;
 
         public HashNode(K key, V value) {
             this.key = key;
             this.value = value;
         }
     }
-
         private ArrayList<HashNode<K, V>> bucketArray;
-        private int numBuckets;
+        private int numberOfBuckets;
         private int size;
 
         public Map() {
+
             bucketArray = new ArrayList<>();
-            numBuckets = 10;
+            numberOfBuckets = 10;
             size = 0;
 
-            for (int i = 0; i < numBuckets; i++)
+            for (int i = 0; i < numberOfBuckets; i++) {
                 bucketArray.add(null);
+            }
         }
 
         public int size() {
@@ -35,16 +35,14 @@ public class Map <K, V> {
         public boolean isEmpty() {
             return size() == 0;
         }
-
         private int getBucketIndex(K key) {
             int hashCode = key.hashCode();
-            int index = hashCode % numBuckets;
+            int index = hashCode % numberOfBuckets;
             return index;
         }
 
         public V remove(K key) {
             int bucketIndex = getBucketIndex(key);
-
             HashNode<K, V> head = bucketArray.get(bucketIndex);
 
             HashNode<K, V> prev = null;
@@ -56,15 +54,17 @@ public class Map <K, V> {
                 head = head.next;
             }
 
-            if (head == null)
+            if (head == null) {
                 return null;
+            }
 
             size--;
-
-            if (prev != null)
+            if (prev != null) {
                 prev.next = head.next;
-            else
+            }
+            else {
                 bucketArray.set(bucketIndex, head.next);
+            }
             return head.value;
         }
 
@@ -73,13 +73,12 @@ public class Map <K, V> {
             int bucketIndex = getBucketIndex(key);
             HashNode<K, V> head = bucketArray.get(bucketIndex);
 
-            while (head != null)
-            {
-                if (head.key.equals(key))
+            while (head != null) {
+                if (head.key.equals(key)) {
                     return head.value;
+                }
                 head = head.next;
             }
-
             return null;
         }
 
@@ -87,10 +86,8 @@ public class Map <K, V> {
             int bucketIndex = getBucketIndex(key);
             HashNode<K, V> head = bucketArray.get(bucketIndex);
 
-            while (head != null)
-            {
-                if (head.key.equals(key))
-                {
+            while (head != null) {
+                if (head.key.equals(key)) {
                     head.value = value;
                     return;
                 }
@@ -103,18 +100,17 @@ public class Map <K, V> {
             newNode.next = head;
             bucketArray.set(bucketIndex, newNode);
 
-            if ((1.0*size)/numBuckets >= 0.7) {
+            if ((1.0*size)/ numberOfBuckets >= 0.7) {
                 ArrayList<HashNode<K, V>> temp = bucketArray;
                 bucketArray = new ArrayList<>();
-                numBuckets = 2 * numBuckets;
+                numberOfBuckets = 2 * numberOfBuckets;
                 size = 0;
-                for (int i = 0; i < numBuckets; i++)
+                for (int i = 0; i < numberOfBuckets; i++){
                     bucketArray.add(null);
+                }
 
-                for (HashNode<K, V> headNode : temp)
-                {
-                    while (headNode != null)
-                    {
+                for (HashNode<K, V> headNode : temp) {
+                    while (headNode != null) {
                         add(headNode.key, headNode.value);
                         headNode = headNode.next;
                     }

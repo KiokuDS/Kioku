@@ -19,6 +19,8 @@
             <MenuItem mnemonicParsing="false" text="Nueva tarjeta" />
             <MenuItem mnemonicParsing="false" text="Nueva Deck" />
                   <MenuItem fx:id="listaTarjetasMenu" mnemonicParsing="false" onAction="#listaTarjetasMenuAction" text="Lista de Tarjetas" />
+                  <MenuItem fx:id="modifyTarjetaMenu" mnemonicParsing="false" onAction="#modifyTarjetaMenuAction" text="Editar Tarjeta" />
+                  <MenuItem fx:id="DictionaryMenu" mnemonicParsing="false" onAction="#DictionaryMenuAction" text="Busqueda" />
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Ayuda">

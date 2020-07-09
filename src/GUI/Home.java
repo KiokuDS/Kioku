@@ -79,7 +79,7 @@ public class Home implements Initializable {
         window.show();
     }
 
-    private void initActions(){
+    public void initActions(){
         //Detecting mouse clicked
         list.setOnMouseClicked(new EventHandler<MouseEvent>(){
             @Override
@@ -114,6 +114,44 @@ public class Home implements Initializable {
         } catch (IOException e) {
         }
     }
+
+
+    @FXML
+    private MenuItem modifyTarjetaMenu;
+
+    @FXML
+    void modifyTarjetaMenuAction(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource("SearchAndModify.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 345 , 480);
+            Stage stage = new Stage();
+            stage.setTitle("Editar Tarjeta");
+            stage.setScene(scene);
+            stage.showAndWait();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+
+    @FXML
+    private MenuItem DictionaryMenu;
+
+
+    @FXML
+    void DictionaryMenuAction(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource("Dictionary.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 640 , 400);
+            Stage stage = new Stage();
+            stage.setTitle("Diccionario");
+            stage.setScene(scene);
+            stage.showAndWait();
+        } catch (IOException e) {
+        }
+    }
     private static int selection;
     public void setSelected(int select){
         selection = select;
@@ -121,18 +159,17 @@ public class Home implements Initializable {
     public static int getSelected(){
         return selection;
     }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         list.setItems(items);
-
         SqliteDB db = new SqliteDB();
         LinkedList deckList = new LinkedList();
         db.listsDecks(deckList);
-        for(int i=0; i< deckList.size(); i++){
+        for(int i=0; i< deckList.size(); i++) {
             items.addAll((String) deckList.get(i));
         }
-        db.closeConnection();
         initActions();
-
+        db.closeConnection();
     }
 }

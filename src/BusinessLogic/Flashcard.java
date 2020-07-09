@@ -32,11 +32,20 @@ public class Flashcard {
     private int repetitions;
     private float easiness;
 
-
+    //Dos formas diferentes de tener tarjetas relacionadas.
+    //Una con una lista de estas, otra con la base de datos.
     public Flashcard(String front, String back){
         this.front = front;
         this.back = back;
         relatedFlashcards = new LinkedList<Flashcard>();
+        id = numberFlashcards++;
+    }
+
+    public Flashcard(String front, String back, String related1, String related2){
+        this.front = front;
+        this.back = back;
+        this.related1 = related1;
+        this.related2 = related2;
         id = numberFlashcards++;
     }
 
@@ -99,10 +108,32 @@ public class Flashcard {
     }
 
 
+    public String getRelated1() {
+        return related1;
+    }
+
+    public void setRelated1(String related1) {
+        this.related1 = related1;
+    }
+
+    public String getRelated2() {
+        return related2;
+    }
+
+    public void setRelated2(String related2) {
+        this.related2 = related2;
+    }
+
     public void setNextEasy(){
         this.nextRevision = nextRevision.plusDays(3);
     }
     public void setNextHard(){
+        this.nextRevision = nextRevision.plusDays(0);
+    }
+    public void setNextEasyDB(){
+        this.nextRevision = nextRevision.plusDays(3);
+    }
+    public void setNextHardDB(){
         this.nextRevision = nextRevision.plusDays(0);
     }
 

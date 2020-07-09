@@ -40,6 +40,7 @@ public class CreateDeck implements Initializable {
         createDeckButton.setOnAction(e-> { db.insertDeck(
                 deckNameInput.getText());
                 setNewDeck(deckNameInput.getText());
+                db.closeConnection();
                 Stage stage = (Stage) createDeckButton.getScene().getWindow();
                 stage.close();
                 }
